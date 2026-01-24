@@ -41,7 +41,9 @@ app.use("/api/v1/movie", apiLimit, movieRouter);
 app.use("/api/v1/review", apiLimit, reviewRouter);
 app.use("/api/v1/watchlist", apiLimit, watchlistRouter);
 
-app.get("/", (req, res) => res.status(200).json({ success: true }));
+app.get("/", (req, res) =>
+  res.status(200).json({ success: true, message: "working fine!" }),
+);
 
 // 404 handler
 app.use((req, res, next) => {
