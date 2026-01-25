@@ -3,6 +3,7 @@ import { authenticated, authorize } from "../middleware/authMiddleware.js";
 import {
   createMovie,
   deleteMovie,
+  deletePoster,
   movie,
   movies,
   searchMovie,
@@ -21,14 +22,12 @@ router.post(
   "/",
   authenticated,
   authorize("admin"),
-  upload.single("poster"),
   createMovie,
 );
 router.put(
   "/:id",
   authenticated,
   authorize("admin"),
-  upload.single("poster"),
   updateMovie,
 );
 router.put("/:id", authenticated, authorize("admin"), deleteMovie);
@@ -40,5 +39,6 @@ router.post(
   uploadPoster,
 );
 router.get("/:id/stats", authenticated, stats);
+router.delete("/:id/poster", authenticated, authorize("admin"), deletePoster);
 
 export default router;

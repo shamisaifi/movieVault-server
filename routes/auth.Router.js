@@ -21,13 +21,8 @@ router.post("/logout", authenticated, logout);
 router.get("/me", authenticated, profile);
 router.put("/update-profile", authenticated, updateProfile);
 
-router.post(
-  "/upload-avatar",
-  authenticated,
-  upload.single("avatar"),
-  uploadAvatar,
-);
+router.post("/avatar", authenticated, upload.single("avatar"), uploadAvatar);
 
-router.delete("/delete-avatar", authenticated, deleteAvatar);
+router.delete("/avatar", authenticated, deleteAvatar);
 
 export default router;

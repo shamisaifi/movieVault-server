@@ -4,6 +4,12 @@ import { Movie } from "../models/Movie.js";
 import { AppError } from "../utils/AppError.js";
 import mongoose from "mongoose";
 import { Review } from "../models/Review.js";
+import {
+  uploadToCloudinary,
+  deleteFromCloudinary,
+  extractPublicId,
+} from "../utils/cloudinary.js";
+
 
 export const movies = asyncHandler(async (req, res, next) => {
   const page = Number(req.query.page) || 1;
@@ -100,10 +106,6 @@ export const createMovie = asyncHandler(async (req, res, next) => {
     cast,
   };
 
-  if (req.file) {
-    movieData.poster = `${process.env.BASE_URL}/${req.file.path}`;
-  }
-
   const movie = await Movie.findOne({ $text: { $search: title } });
 
   if (movie) {
@@ -146,10 +148,6 @@ export const updateMovie = asyncHandler(async (req, res, next) => {
     updates.$addToSet = { cast: { $each: req.body.cast } };
   }
 
-  if (req.file) {
-    updates.poster = `${process.env.BASE_URL}/${req.file.path}`;
-  }
-
   const movie = await Movie.findByIdAndUpdate(
     id,
     { updates },
@@ -189,26 +187,60 @@ export const uploadPoster = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
 
   if (!req.file) {
-    return next(new AppError("poster not found to found", 404));
+    return next(new AppError("Please upload a poster image", 400));
   }
 
-  const filename = `${process.env.BASE_URL}/${req.file.path}`;
-  const movie = await Movie.findByIdAndUpdate(
-    id,
-    { poster: filename },
-    {
-      new: true,
-      runValidators: true,
-    },
+  const movie = await Movie.findById(id);
+
+  if (!movie) {
+    return next(new AppError("Movie not found", 404));
+  }
+
+  if (movie.poster) {
+    const oldPublicId = extractPublicId(movie.poster);
+    if (oldPublicId) {
+      await deleteFromCloudinary(oldPublicId);
+    }
+  }
+
+  const result = await uploadToCloudinary(
+    req.file.buffer,
+    "movie-review/posters",
+    `poster-${movie._id}-${Date.now()}`,
   );
+
+  movie.poster = result.secure_url;
+  await movie.save();
 
   res.status(200).json({
     success: true,
-    message: "poster uploaded",
+    message: "Poster uploaded successfully",
     data: {
-      title: movie.title,
       poster: movie.poster,
     },
+  });
+});
+
+export const deletePoster = asyncHandler(async (req, res, next) => {
+  const movie = await Movie.findById(req.params.id);
+
+  if (!movie) {
+    return next(new AppError("Movie not found", 404));
+  }
+
+  if (movie.poster) {
+    const publicId = extractPublicId(movie.poster);
+    if (publicId) {
+      await deleteFromCloudinary(publicId);
+    }
+  }
+
+  movie.poster = undefined;
+  await movie.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Poster deleted successfully",
   });
 });
 

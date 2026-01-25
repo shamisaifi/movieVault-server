@@ -2,14 +2,18 @@ import { asyncHandler } from "../middleware/asyncHandler.js";
 import { User } from "../models/User.js";
 import { RefreshToken } from "../models/RefreshToken.js";
 import { AppError } from "../utils/AppError.js";
-import fs from "fs";
-import path from "path";
 import {
   generateAccessToken,
   generateRefreshToken,
 } from "../utils/generateToken.js";
 import { getCookieOptions } from "../utils/cookieOptions.js";
 import jwt from "jsonwebtoken";
+import {
+  uploadToCloudinary,
+  deleteFromCloudinary,
+  extractPublicId,
+} from "../utils/cloudinary.js";
+
 
 export const register = asyncHandler(async (req, res, next) => {
   const { name, email, password, role } = req.body;
@@ -40,7 +44,7 @@ export const register = asyncHandler(async (req, res, next) => {
     message: "User registered successfully",
     accessToken,
     data: {
-      id: user._id,
+      id: { id: user._id, name: user.name },
     },
   });
 });
@@ -183,48 +187,61 @@ export const updateProfile = asyncHandler(async (req, res, next) => {
 
 export const uploadAvatar = asyncHandler(async (req, res, next) => {
   if (!req.file) {
-    return next(new AppError("Avatar file is required", 400));
+    return next(new AppError("Please upload an image", 400));
   }
 
   const user = await User.findById(req.user.id);
 
   if (!user) {
-    return next(new AppError("user not found", 404));
+    return next(new AppError("User not found", 404));
   }
 
   if (user.avatar) {
-    const oldPath = path.join(
-      process.cwd(),
-      user.avatar.replace(process.env.BASE_URL, ""),
-    );
-    fs.unlink(oldPath, () => {});
+    const oldPublicId = extractPublicId(user.avatar);
+    if (oldPublicId) {
+      await deleteFromCloudinary(oldPublicId);
+    }
   }
 
-  const fileUrl = `${process.env.BASE_URL}/${req.file.path}`;
+  const result = await uploadToCloudinary(
+    req.file.buffer, // File buffer
+    "movie-review/avatars", // Cloudinary folder
+    `avatar-${user._id}-${Date.now()}`, // Custom filename
+  );
 
-  user.avatar = fileUrl;
-
+  user.avatar = result.secure_url; // HTTPS URL
   await user.save();
 
   res.status(200).json({
     success: true,
-    message: "updated",
-    avatar: fileUrl,
+    message: "Avatar uploaded successfully",
+    data: {
+      avatar: user.avatar,
+    },
   });
 });
 
 export const deleteAvatar = asyncHandler(async (req, res, next) => {
-  const user = await User.findByIdAndUpdate(
-    req.user.id,
-    { avatar: null },
-    { new: true, runValidators: true },
-  );
+  const user = await User.findById(req.user.id);
 
   if (!user) {
     return next(new AppError("User not found", 404));
   }
 
-  if (user.avatar) unlink(oldFilePath);
+  // Delete from Cloudinary
+  if (user.avatar) {
+    const publicId = extractPublicId(user.avatar);
+    if (publicId) {
+      await deleteFromCloudinary(publicId);
+    }
+  }
 
-  res.status(200).json({ success: true, message: "avatar removed" });
+  // Remove from database
+  user.avatar = undefined;
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Avatar deleted successfully",
+  });
 });
