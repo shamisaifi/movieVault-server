@@ -11,7 +11,7 @@ import {
   updateMovie,
   uploadPoster,
 } from "../controllers/movies.js";
-import { upload } from "../utils/fileUpload.js";
+import { upload } from "../middleware/upload.js";
 
 const router = express.Router();
 

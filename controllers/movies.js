@@ -1,15 +1,12 @@
-import { json } from "express";
 import { asyncHandler } from "../middleware/asyncHandler.js";
 import { Movie } from "../models/Movie.js";
 import { AppError } from "../utils/AppError.js";
 import mongoose from "mongoose";
-import { Review } from "../models/Review.js";
 import {
   uploadToCloudinary,
   deleteFromCloudinary,
   extractPublicId,
 } from "../utils/cloudinary.js";
-
 
 export const movies = asyncHandler(async (req, res, next) => {
   const page = Number(req.query.page) || 1;
@@ -189,6 +186,8 @@ export const uploadPoster = asyncHandler(async (req, res, next) => {
   if (!req.file) {
     return next(new AppError("Please upload a poster image", 400));
   }
+
+  console.log(req.file);
 
   const movie = await Movie.findById(id);
 

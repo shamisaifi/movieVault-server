@@ -10,7 +10,7 @@ import {
   uploadAvatar,
 } from "../controllers/auth.js";
 import { authenticated } from "../middleware/authMiddleware.js";
-import { upload } from "../utils/fileUpload.js";
+import { upload } from "../middleware/upload.js";
 
 const router = express.Router();
 
