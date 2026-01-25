@@ -9,7 +9,7 @@ import {
 const router = express.Router();
 
 router.get("/", authenticated, watchlist);
-router.post("/:id", authenticated, addToWatchlist);
-router.delete("/:id", authenticated, removeFromWatchlist);
+router.post("/add/:id", authenticated, addToWatchlist);
+router.post("/remove/:id", authenticated, removeFromWatchlist);
 
 export default router;

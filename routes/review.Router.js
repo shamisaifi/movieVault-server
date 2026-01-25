@@ -14,7 +14,7 @@ const router = express.Router();
 router.post("/:id", authenticated, createReview);
 router.get("/movie/:id", reviews);
 router.get("/:id", review);
-router.post("/:id/update", authenticated, updateReview);
+router.post("/:id", authenticated, updateReview);
 router.post("/:id/like", authenticated, addLike);
 router.post("/:id/unlike", authenticated, removeLike);
 
