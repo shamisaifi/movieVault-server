@@ -71,9 +71,11 @@ export const reviews = asyncHandler(async (req, res, next) => {
     text: review.reviewText,
     rating: review.rating,
     likeCount: review.likeCount,
+    createdAt: review.createdAt,
     user: {
       name: review.user.name,
       avatar: review.user.avatar,
+      id: review.user._id,
     },
   }));
 

@@ -66,7 +66,7 @@ export const searchMovie = asyncHandler(async (req, res, next) => {
 export const movie = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
 
-  const movie = await Movie.findById(id).select("-__v");
+  const movie = await Movie.findById(id).select("-__v").lean();
 
   if (!movie) {
     return next(new AppError("Movie not found", 404));
