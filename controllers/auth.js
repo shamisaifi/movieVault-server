@@ -105,7 +105,7 @@ export const refresh = asyncHandler(async (req, res, next) => {
     return next(new AppError("Refresh token is revoked", 401));
   }
 
-  if (new Date() > storedToken.createdAt) {
+  if (new Date() > storedToken.expiresAt) {
     return next(new AppError("Refresh token expired", 401));
   }
 
