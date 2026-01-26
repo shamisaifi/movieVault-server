@@ -48,7 +48,6 @@ const reviewSchema = new mongoose.Schema(
 );
 
 // indexes
-reviewSchema.index({ _id: 1 });
 reviewSchema.index({ movie: 1, user: 1 }, { unique: true });
 
 // ___________methods____________
