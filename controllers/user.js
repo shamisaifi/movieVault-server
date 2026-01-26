@@ -24,7 +24,7 @@ export const allUsers = asyncHandler(async (req, res, next) => {
 export const userProfile = asyncHandler(async (req, res, next) => {
   const userId = req.params.id;
 
-  const user = await User.findById(userId).select("-__v");
+  const user = await User.findById(userId).select("-__v").lean()
 
   if (!user) {
     return next(new AppError("user not found", 404));
