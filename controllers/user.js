@@ -3,6 +3,7 @@ import { Review } from "../models/Review.js";
 import { User } from "../models/User.js";
 import { AppError } from "../utils/AppError.js";
 import mongoose from "mongoose";
+import { deleteFromCloudinary, extractPublicId, uploadToCloudinary } from "../utils/cloudinary.js";
 
 export const allUsers = asyncHandler(async (req, res, next) => {
   const page = Number(req.query.page) || 1;
