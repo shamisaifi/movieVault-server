@@ -21,7 +21,7 @@ export const watchlist = asyncHandler(async (req, res, next) => {
 
   const watchlist = await Movie.find({
     _id: { $in: user.watchlist },
-  }).select("title genre poster director releaseYear -_id");
+  }).select("title genre poster director releaseYear");
 
   res.status(200).json({
     success: true,
