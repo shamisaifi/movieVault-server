@@ -8,12 +8,6 @@ import {
 } from "../utils/generateToken.js";
 import { getCookieOptions } from "../utils/cookieOptions.js";
 import jwt from "jsonwebtoken";
-import {
-  uploadToCloudinary,
-  deleteFromCloudinary,
-  extractPublicId,
-} from "../utils/cloudinary.js";
-
 
 export const register = asyncHandler(async (req, res, next) => {
   const { name, email, password, role } = req.body;
@@ -38,6 +32,8 @@ export const register = asyncHandler(async (req, res, next) => {
     expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     createdByIp: req.ip,
   });
+
+  res.cookie("refreshToken", refreshToken, getCookieOptions());
 
   res.status(201).json({
     success: true,
@@ -78,7 +74,7 @@ export const login = asyncHandler(async (req, res, next) => {
     success: true,
     message: "Login successful",
     accessToken,
-    user: {
+    data: {
       id: user._id,
       name: user.name,
       email: user.email,
@@ -163,5 +159,3 @@ export const profile = asyncHandler(async (req, res, next) => {
     data: user,
   });
 });
-
-

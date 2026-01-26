@@ -26,9 +26,11 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: '*',
+    origin: "*",
+    credentials: true,
   }),
 );
+
 app.use(helmet());
 app.use("/uploads", express.static("uploads"));
 
