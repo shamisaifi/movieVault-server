@@ -85,7 +85,7 @@ reviewSchema.methods.removeLike = async function (userId) {
 };
 
 async function updateMovieStats(movieId) {
-  const stats = await Review.aggregate(
+  const stats = await Review.aggregate([
     {
       $match: { movie: movieId },
     },
@@ -98,7 +98,7 @@ async function updateMovieStats(movieId) {
         ratings: { $push: "$rating" },
       },
     },
-  );
+  ]);
 
   if (stats.length > 0) {
     const { totalReviews, averageRating, totalLikes, ratings } = stats[0];
