@@ -68,7 +68,7 @@ export const reviews = asyncHandler(async (req, res, next) => {
 
   const formatted = reviews.map((review) => ({
     id: review._id,
-    text: review.reviewText,
+    reviewText: review.reviewText,
     rating: review.rating,
     likeCount: review.likeCount,
     createdAt: review.createdAt,

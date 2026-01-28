@@ -1,6 +1,5 @@
 import jwt from "jsonwebtoken";
 import { AppError } from "../utils/AppError.js";
-import { asyncHandler } from "./asyncHandler.js";
 
 export const authenticated = async (req, res, next) => {
   const authHeader = req.headers.authorization;
