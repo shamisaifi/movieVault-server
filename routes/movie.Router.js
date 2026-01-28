@@ -18,19 +18,9 @@ const router = express.Router();
 router.get("/", movies);
 router.get("/search", searchMovie);
 router.get("/:id", movie);
-router.post(
-  "/",
-  authenticated,
-  authorize("admin"),
-  createMovie,
-);
-router.put(
-  "/:id",
-  authenticated,
-  authorize("admin"),
-  updateMovie,
-);
-router.put("/:id", authenticated, authorize("admin"), deleteMovie);
+router.post("/", authenticated, authorize("admin"), createMovie);
+router.put("/:id", authenticated, authorize("admin"), updateMovie);
+router.delete("/:id", authenticated, authorize("admin"), deleteMovie);
 router.post(
   "/:id/poster",
   authenticated,

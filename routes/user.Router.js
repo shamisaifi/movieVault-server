@@ -16,7 +16,7 @@ import { upload } from "../middleware/upload.js";
 const router = express.Router();
 
 router.get("/", authenticated, allUsers);
-router.get("/:id", userProfile);
+router.get("/:id", authenticated, userProfile);
 router.get("/:id/reviews", authenticated, reviews);
 router.post("/:id/toggleFollow", authenticated, toggleFollow);
 router.get("/:id/followers", authenticated, followers);
