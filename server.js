@@ -7,6 +7,7 @@ import ratelimit from "express-rate-limit";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { AppError } from "./utils/AppError.js";
 import cookieParser from "cookie-parser";
+import { initCloudinary } from "./config/cloudinary.js";
 import "./models/User.js";
 import "./models/Review.js";
 import "./models/Movie.js";
@@ -18,6 +19,7 @@ const apiLimit = ratelimit({
 });
 
 dotenv.config();
+initCloudinary();
 connectDB();
 
 const app = express();

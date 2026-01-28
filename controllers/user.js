@@ -3,7 +3,11 @@ import { Review } from "../models/Review.js";
 import { User } from "../models/User.js";
 import { AppError } from "../utils/AppError.js";
 import mongoose from "mongoose";
-import { deleteFromCloudinary, extractPublicId, uploadToCloudinary } from "../utils/cloudinary.js";
+import {
+  deleteFromCloudinary,
+  extractPublicId,
+  uploadToCloudinary,
+} from "../utils/cloudinary.js";
 
 export const allUsers = asyncHandler(async (req, res, next) => {
   const page = Number(req.query.page) || 1;
@@ -25,7 +29,7 @@ export const allUsers = asyncHandler(async (req, res, next) => {
 export const userProfile = asyncHandler(async (req, res, next) => {
   const userId = req.params.id;
 
-  const user = await User.findById(userId).select("-__v").lean()
+  const user = await User.findById(userId).select("-__v").lean();
 
   if (!user) {
     return next(new AppError("user not found", 404));
@@ -241,11 +245,17 @@ export const uploadAvatar = asyncHandler(async (req, res, next) => {
     }
   }
 
-  const result = await uploadToCloudinary(
-    req.file.buffer, // File buffer
-    "movie-review/avatars", // Cloudinary folder
-    `avatar-${user._id}-${Date.now()}`, // Custom filename
-  );
+  let result;
+  try {
+    result = await uploadToCloudinary(
+      req.file.buffer,
+      "movie-review/avatars",
+      `avatar-${user._id}-${Date.now()}`,
+    );
+  } catch (err) {
+    console.error("Cloudinary upload failed:", err);
+    return next(new AppError("Image upload failed", 500));
+  }
 
   user.avatar = result.secure_url; // HTTPS URL
   await user.save();

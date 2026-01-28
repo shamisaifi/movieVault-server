@@ -72,10 +72,11 @@ export const reviews = asyncHandler(async (req, res, next) => {
     rating: review.rating,
     likeCount: review.likeCount,
     createdAt: review.createdAt,
+    likes: review.likes,
     user: {
+      id: review.user._id,
       name: review.user.name,
       avatar: review.user.avatar,
-      id: review.user._id,
     },
   }));
 
@@ -178,11 +179,9 @@ export const addLike = asyncHandler(async (req, res, next) => {
     return next(new AppError("Review not found", 404));
   }
 
-   if (review.likes.includes(userId)) {
-     return next(new AppError("Already liked", 400));
-   }
-  
-  
+  if (review.likes.includes(userId)) {
+    return next(new AppError("Already liked", 400));
+  }
 
   await review.addLike(userId);
 

@@ -187,8 +187,6 @@ export const uploadPoster = asyncHandler(async (req, res, next) => {
     return next(new AppError("Please upload a poster image", 400));
   }
 
-  console.log(req.file);
-
   const movie = await Movie.findById(id);
 
   if (!movie) {
@@ -202,11 +200,17 @@ export const uploadPoster = asyncHandler(async (req, res, next) => {
     }
   }
 
-  const result = await uploadToCloudinary(
-    req.file.buffer,
-    "movie-review/posters",
-    `poster-${movie._id}-${Date.now()}`,
-  );
+  let result;
+  try {
+    result = await uploadToCloudinary(
+      req.file.buffer,
+      "movie-review/posters",
+      `poster-${movie._id}-${Date.now()}`,
+    );
+  } catch (err) {
+    console.error("Cloudinary upload failed:", err);
+    return next(new AppError("Image upload failed", 500));
+  }
 
   movie.poster = result.secure_url;
   await movie.save();
